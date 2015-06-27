@@ -1,5 +1,4 @@
 var http = require('http');
-var mipod = require('mipod');
 var express = require('express');
 var app = express();
 var server = http.createServer(app).listen(3000, function() {
@@ -13,8 +12,5 @@ app.set('view engine', 'jsx');
 app.engine('jsx', require('express-react-views').createEngine());
 
 io.on('connection', function(socket) {
-  mipod.asWebSocket(socket, {
-    prefix: 'api:',
-    dataPath: '/Users/jaybaker/Music/mpdisco'
-  });
+	require('./commands.js')(socket);
 })
