@@ -5,7 +5,15 @@ var Player = React.createClass({
   render: function() {
     return (
       <div>
-        <Controls />
+        <div className="row">
+          <Search />
+        </div>
+        <div className="row">
+          <Library />
+        </div>
+        <div className="row">
+          <Controls />
+        </div>
       </div>
     );
   }
