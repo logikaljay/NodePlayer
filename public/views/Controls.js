@@ -1,5 +1,5 @@
 var Controls = React.createClass({
-  getInitialState() {
+  getInitialState: function() {
     return {
       state: 'idle',
       elapsed: 0,
@@ -9,36 +9,36 @@ var Controls = React.createClass({
     }
   },
 
-  prev() {
+  prev: function() {
 
   },
 
-  next() {
+  next: function() {
 
   },
 
-  play() {
+  play: function() {
     socket.emit('api:controls:play',{
       file: './public/data/test.mp3'
     });
     this.setState({ state: 1 })
   },
 
-  pause() {
+  pause: function() {
     socket.emit('api:controls:pause');
     this.setState({ state: 2 })
   },
 
-  stop() {
+  stop: function() {
     socket.emit('api:controls:stop');
     this.setState({ state: 3, elapsed: 0, progress: 0 })
   },
 
-  seek(event) {
+  seek: function(event) {
     this.setState({ seekTo: event.target.value });
   },
 
-  doSeek() {
+  doSeek: function() {
     // seekTo is a percent, generate a timestamp
     var durationOfSong = this.state.duration;
     var seekPosition = durationOfSong / 100 * this.state.seekTo;
@@ -50,7 +50,7 @@ var Controls = React.createClass({
     });
   },
 
-  componentDidMount() {
+  componentDidMount: function() {
     socket.on('api:controls:status', function(progress) {
       var percent = 0;
       if (progress.state != "3") {
@@ -66,7 +66,7 @@ var Controls = React.createClass({
     }.bind(this));
   },
 
-  render() {
+  render: function() {
     return (
       <div>
         <div className="row" style={{position:'fixed', bottom: 28, zIndex:2, width: '100%'}}>
@@ -81,9 +81,9 @@ var Controls = React.createClass({
             </div>
             <div className="col s4 center-align">
               <i className="material-icons medium" onClick={this.prev}>skip_previous</i>
-              <i className={"material-icons medium " + (this.state.state == "2" && "active")} onClick={this.pause}>pause</i>
-              <i className={"material-icons medium " + (this.state.state == "1" && "active")} onClick={this.play}>play_arrow</i>
-              <i className={"material-icons medium " + (this.state.state == "3" && "active")} onClick={this.stop}>stop</i>
+              <a href="javascript:void(0);" onClick={this.pause}><i className={"material-icons medium " + (this.state.state == "2" && "active")}>pause</i></a>
+              <a href="javascript:void(0);" onClick={this.play}><i className={"material-icons medium " + (this.state.state == "1" && "active")}>play_arrow</i></a>
+              <a href="javascript:void(0);" onClick={this.stop}><i className={"material-icons medium " + (this.state.state == "3" && "active")}>stop</i></a>
               <i className="material-icons medium" onClick={this.next}>skip_next</i>
             </div>
             <div className="col s4 right-align">

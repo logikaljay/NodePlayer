@@ -1,5 +1,5 @@
 var Search = React.createClass({
-  render() {
+  render: function() {
     return (
       <nav>
         <div className="nav-wrapper">

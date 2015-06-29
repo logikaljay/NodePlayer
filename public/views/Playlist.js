@@ -1,17 +1,22 @@
 var Playlist = React.createClass({
-  getInitialProps() {
+  getInitialProps: function() {
     return { data: [] };
   },
-  getInitialState() {
-    return { currentSong: "", state: 0 };
+  getInitialState: function() {
+    return { currentSong: "", state: 0, songs: [] };
   },
-  componentDidMount() {
+  componentDidMount: function() {
+    socket.on('api:playlist:list');
+    socket.on('api:playlist:change', function(songs) {
+      this.setState({songs: songs});
+    }.bind(this));
+
     socket.on('api:controls:status', function(status) {
       this.setState({ currentSong: status.file, state: status.state })
     }.bind(this))
   },
-  render() {
-    var songs = this.props.data.map(function(song) {
+  render: function() {
+    var songs = this.state.songs.map(function(song) {
       var active = (song.file == this.state.currentSong) && this.state.state != 3;
       return <Track ref={song.file} data={song} active={active} />;
     }.bind(this));
@@ -25,10 +30,10 @@ var Playlist = React.createClass({
 });
 
 var Track = React.createClass({
-  getInitialState() {
+  getInitialState: function() {
     return { active: false };
   },
-  play() {
+  play: function() {
     socket.emit('api:controls:stop');
 
     socket.emit('api:controls:play',{
@@ -38,7 +43,7 @@ var Track = React.createClass({
     this.setState({ active: true });
   },
 
-  render() {
+  render: function() {
     return (
       <li className={"collection-item avatar " + (this.props.active && "active")} onClick={this.play}>
         <i className="material-icons circle playlist-img">play_arrow</i>
@@ -46,6 +51,7 @@ var Track = React.createClass({
         <p>{this.props.data.artist} <br />
            {this.props.data.album}
         </p>
+        <a href="javascript:void(0);" className="secondary-content"><i className="material-icons">delete</i></a>
       </li>
     );
   }

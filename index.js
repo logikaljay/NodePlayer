@@ -17,4 +17,5 @@ require('./lib/art')(io);
 io.on('connection', function(socket) {
 	require('./lib/controls')(io, socket);
 	require('./lib/library')(io, socket);
+	require('./lib/playlist')(io, socket);
 });
