@@ -2,7 +2,7 @@ var Search = React.createClass({
   render() {
     return (
       <nav>
-        <div className="nav-wrapper col s9" style={{marginLeft:'240px'}}>
+        <div className="nav-wrapper">
           <div className="input-field">
             <input id="search" type="search" required />
             <label htmlFor="search">

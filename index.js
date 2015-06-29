@@ -13,8 +13,8 @@ app.engine('jsx', require('express-react-views').createEngine());
 
 
 require('./lib/art')(io);
-require('./lib/library')(io);
 
 io.on('connection', function(socket) {
 	require('./lib/controls')(io, socket);
+	require('./lib/library')(io, socket);
 });

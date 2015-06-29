@@ -11,9 +11,8 @@ var Player = React.createClass({
         <div className="row">
           <Library />
         </div>
-        <div className="row">
-          <Controls />
-        </div>
+
+        <Controls />
       </div>
     );
   }
