@@ -1,6 +1,6 @@
 var Library = React.createClass({
   getInitialState: function() {
-    return { songs: [] };
+    return { songs: [""] };
   },
 
   componentDidMount: function() {

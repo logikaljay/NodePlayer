@@ -3,14 +3,16 @@ var playlist = [];
 
 module.exports = function(io, socket) {
   socket.on('api:playlist:add', function(file) {
-    // find the song from library, add to playlist.
-    var song = library.items.filter(function(entry) {
-      return entry.file == file;
-    });
+    library.getItems(function(items) {
+      // find the song from library, add to playlist.
+      var song = items.filter(function(entry) {
+        return entry.file == file;
+      });
 
-    // emit api:playlist:change
-    playlist.push(song[0]);
-    io.emit('api:playlist:change', playlist);
+      // emit api:playlist:change
+      playlist.push(song[0]);
+      io.emit('api:playlist:change', playlist);
+    });
   });
 
   socket.on('api:playlist:list', function() {

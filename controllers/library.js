@@ -11,36 +11,19 @@ module.exports = function(io, socket) {
    *  List library
    */
   socket.on('api:library:list', function() {
-    io.emit('api:library:list', require('../library.json'));
+    library.getItems(function(items) {
+      io.emit('api:library:list', items);
+    });
+
   });
 
   socket.on('api:library:refresh', function() {
-    walk('./public/data', function(err, results) {
-      var songs = [];
-      async.each(results, function(result, cb) {
-        mm(fs.createReadStream(result), {duration: true}, function(err, data) {
-          if (typeof data.artist !== 'string') {
-            data.artist = data.artist.join();
-          }
-
-          var song = {
-            title: data.title,
-            artist: data.artist,
-            album: data.album,
-            duration: data.duration,
-            file: result,
-          };
-
-          songs.push(song);
-
-          cb();
-        });
-      }, function(err) {
-        fs.writeFile('/Users/jaybaker/Documents/Node/NodePlayer/library.json', JSON.stringify(songs), function(err) {
-          io.emit('api:library:list', songs);
-        });
-      })
-    });
+    library.refresh(function() {
+      library.getItems(function(items) {
+        console.log(items);
+        io.emit('api:library:list', items);
+      });
+    })
   });
 
   socket.on('api:library:search', function(term) {
