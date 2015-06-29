@@ -25,3 +25,11 @@ i.medium {
 .hidden {
   display: none;
 }
+
+.dz-message {
+  display: none;
+}
+
+.dz-preview {
+  display: none;
+}

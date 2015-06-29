@@ -16,6 +16,8 @@ var Player = React.createClass({
           </div>
         </div>
         <Controls />
+
+        <Upload />
       </div>
     );
   }

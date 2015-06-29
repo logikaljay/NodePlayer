@@ -6,8 +6,14 @@ var Library = React.createClass({
   componentDidMount: function() {
     socket.emit('api:library:list');
     socket.on('api:library:list', function(songs) {
+      console.log(songs);
       this.setState({ songs: songs });
     }.bind(this));
+
+    var dropzone = new Dropzone(".dropzone", {
+      url: "/upload",
+      acceptedFiles: '.mp3',
+    });
   },
 
   render: function() {
@@ -15,7 +21,7 @@ var Library = React.createClass({
       return <LibrarySong song={song} />
     });
     return (
-      <div style={{overflow: 'auto', height: '70%'}}>
+      <div action="/upload" className="dropzone" style={{overflow: 'auto', height: '70%'}}>
         <table className="table table-hover">
           <thead>
             <th>Artist</th>
@@ -24,22 +30,6 @@ var Library = React.createClass({
             <th>Duration</th>
           </thead>
           <tbody>
-            {songs}
-            {songs}
-            {songs}
-            {songs}
-            {songs}
-            {songs}
-            {songs}
-            {songs}
-            {songs}
-            {songs}
-            {songs}
-            {songs}
-            {songs}
-            {songs}
-            {songs}
-            {songs}
             {songs}
           </tbody>
         </table>
