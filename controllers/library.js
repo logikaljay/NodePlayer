@@ -47,7 +47,6 @@ module.exports = function(io, socket) {
   });
 
   socket.on('api:library:songs', function(data, fn) {
-    console.log(data);
     var db = new sqlite3.Database(__dirname + '/../library.db');
     db.serialize(function() {
       db.all("SELECT * FROM library WHERE artist = ?", data.artist, function(err, rows) {
@@ -58,7 +57,16 @@ module.exports = function(io, socket) {
     db.close();
   });
 
-  socket.on('api:library:search', function(term) {
+  socket.on('api:library:search', function(text) {
+    // firstly, get the list of songs that match the text
+    var db = new sqlite3.Database(__dirname + '/../library.db');
+    db.serialize(function() {
+      db.all("SELECT * FROM library WHERE LOWER(artist) LIKE '%"+text+"%' OR LOWER(album) LIKE '%"+text+"%' OR LOWER(title) LIKE '%"+text+"%'", function(err, rows) {
+        console.log(rows);
+        socket.emit('api:library:searchResult', rows);
+      });
+    });
 
+    db.close();
   });
 }

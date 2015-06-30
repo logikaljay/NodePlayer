@@ -28,8 +28,15 @@ var Artist = React.createClass({
 
   componentDidMount: function() {
     socket.emit('api:library:songs', this.props.artist, function(songs) {
-      console.log(songs);
       this.setState({ songs: songs });
+    }.bind(this));
+
+    socket.on('api:library:searchResult', function(songs) {
+      var artistSongs = songs.filter(function(song) {
+        return this.props.artist.artist == song.artist;
+      }.bind(this));
+
+      this.setState({songs: artistSongs});
     }.bind(this));
 
     $(".collapsible").collapsible();
@@ -45,13 +52,29 @@ var Artist = React.createClass({
     });
   },
 
+  addAll: function() {
+    socket.emit('api:playlist:add', this.state.songs);
+  },
+
   render: function() {
     var songs = this.state.songs.map(function(song) {
       return <Song song={song} />;
     });
+
+    var styles = {};
+    if (this.state.songs.length == 0) {
+      styles = { display: 'none' };
+    }
+
     return (
-      <li>
-        <div className="collapsible-header"><i className="material-icons">filter_drama</i>{this.props.artist}</div>
+      <li style={styles}>
+        <div className="collapsible-header">
+          <i className="material-icons">filter_drama</i>
+          {this.props.artist}
+          <span className="secondary-content">
+            <a href="javascript:void(0);" onClick={this.addAll}><i className="material-icons">add</i></a>
+          </span>
+        </div>
         <div className="collapsible-body">
           <div style={{marginLeft: '55px'}}>
             <table className="table table-hover" width="100%">
@@ -69,7 +92,6 @@ var Artist = React.createClass({
 var Song = React.createClass({
   add: function() {
     socket.emit('api:playlist:add', this.props.song);
-    console.log('adding: ' + this.props.song.file);
   },
 
   render: function() {

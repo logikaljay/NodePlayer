@@ -13,9 +13,15 @@ module.exports = function(io, socket) {
         'VALUES (?, ?, ?, ?, ?)'
       );
 
-      stmt.run(song.file, song.title, song.artist, song.album, song.duration);
-      stmt.finalize();
+      if (song.constructor === Array) {
+        song.map(function(s) {
+          stmt.run(s.file, s.title, s.artist, s.album, s.duration);
+        });
+      } else {
+        stmt.run(song.file, song.title, song.artist, song.album, song.duration);
+      }
 
+      stmt.finalize();
       db.all("SELECT * FROM playlist", function(err, rows) {
         // emit to all sockets
         io.emit('api:playlist:change', rows);
@@ -44,7 +50,7 @@ module.exports = function(io, socket) {
       stmt.run(song.file);
       stmt.finalize();
 
-      db.all("SELECT * FROM playlist", function(err, rows) {
+      db.all('SELECT * FROM playlist', function(err, rows) {
         // emit to all sockets
         io.emit('api:playlist:change', rows);
       });
@@ -52,4 +58,18 @@ module.exports = function(io, socket) {
 
     db.close();
   });
+
+  socket.on('api:playlist:clear', function() {
+    var db = new sqlite3.Database(__dirname + '/../library.db');
+    db.serialize(function() {
+      db.run('DELETE FROM playlist');
+
+      db.all("SELECT * FROM playlist", function(err, rows) {
+        // emit to all sockets
+        io.emit('api:playlist:change', rows);
+      });
+    });
+
+    db.close();
+  })
 }

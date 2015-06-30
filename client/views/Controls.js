@@ -73,7 +73,7 @@ var Controls = React.createClass({
   render: function() {
     return (
       <div>
-        <div className="row" style={{position:'fixed', bottom: 28, zIndex:2, width: '100%'}}>
+        <div className="row" style={{display: 'none', position:'fixed', bottom: 28, zIndex:2, width: '100%'}}>
           <p className="range-field">
             <input ref="progressbar" type="range" min="0" max="100" value={this.state.progress} onChange={this.seek} onMouseUp={this.doSeek} className="progressbar" />
           </p>

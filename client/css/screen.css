@@ -1,3 +1,7 @@
+body {
+  overflow: hidden;
+}
+
 i.medium {
   font-size: 2.5rem;
   margin:0 7px;
@@ -32,4 +36,10 @@ i.medium {
 
 .collapsible {
   margin-top: 0 !important;
+}
+
+.playlist-controls a {
+  position:absolute;
+  right: 1rem;
+  color:rgba(255, 255, 255, 0.7);
 }

@@ -12,13 +12,22 @@ var Playlist = React.createClass({
       this.setState({songs: songs});
     }.bind(this));
     socket.on('api:playlist:change', function(songs) {
-      console.log("!!");
-      console.log(songs);
       this.setState({songs: songs});
     }.bind(this));
     socket.on('api:controls:status', function(status) {
       this.setState({ currentSong: status.file, state: status.state })
-    }.bind(this))
+    }.bind(this));
+
+    $(function() {
+      $(".playlist").css({
+        height:$(window).height() - 145
+      })
+    });
+    $(window).on('resize', function() {
+      $(".playlist").css({
+        height:$(window).height() - 145
+      })
+    });
   },
 
   render: function() {
@@ -28,7 +37,7 @@ var Playlist = React.createClass({
     }.bind(this));
 
     return (
-      <ul className="collection playlist">
+      <ul className="collection playlist z-depth-1" style={{overflow: 'auto', margin:'0 0 1rem 0'}}>
         {songs}
       </ul>
     );
@@ -51,7 +60,6 @@ var Track = React.createClass({
   },
 
   delete: function() {
-    console.log("sending delete: " + this.props.data);
     socket.emit('api:playlist:remove', this.props.data);
   },
 

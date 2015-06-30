@@ -7,11 +7,12 @@ var Player = React.createClass({
     return (
       <div action="/upload" className="dropzone">
         <div className="row">
-          <div className="col s6" style={{padding:0}}>
+          <div className="col s6" style={{paddingLeft:0}}>
             <Search />
             <Library />
           </div>
-          <div className="col s6">
+          <div className="col s6" style={{paddingRight:0,paddingTop:0}}>
+            <PlaylistControls />
             <Playlist />
           </div>
         </div>
