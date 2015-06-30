@@ -27,6 +27,8 @@ module.exports = function(io, socket) {
 	 */
 	socket.on('api:controls:play', function(obj) {
 		console.log('received play');
+    clearInterval(t);
+
 		// check if we are resuming, or playing new file
 		if (status.state == PlayerState.paused) {
 			// resume playback with pause() toggle
@@ -34,9 +36,11 @@ module.exports = function(io, socket) {
 		} else {
 
 			// start new player
+      player = null;
+      status.state = PlayerState.stopped;
  		 	player = new Mplayer();
 			player.setFile(obj.file);
-			player.play();
+      console.log(obj.file);
 
 			var parser = mm(fs.createReadStream(obj.file), {duration: true}, function(err, data) {
 				status.duration = data.duration;
@@ -46,7 +50,9 @@ module.exports = function(io, socket) {
 			});
 		}
 
-		// setup current obj
+    player.play();
+
+    // setup current obj
 		status.file = obj.file;
 		status.state = PlayerState.playing;
 
@@ -63,7 +69,7 @@ module.exports = function(io, socket) {
 		}, 1000);
 
 		// setup on song end
-		player.on('end', function() {
+		player.once('end', function() {
 			console.log("song ended");
 			if (status.state != PlayerState.stopped) {
 				// check if queue.length > 0
@@ -90,6 +96,7 @@ module.exports = function(io, socket) {
 							if (song !== undefined) {
 								// play index
 								player.setFile(song.file);
+                console.log('playing next: ' + song.file);
 								player.play();
 
 								var parser = mm(fs.createReadStream(song.file), {duration: true}, function(err, data) {
@@ -104,12 +111,14 @@ module.exports = function(io, socket) {
 
 								clearInterval(t);
 								t = setInterval(function() {
-									player.getTimePosition(function(elapsed) {
-										status.elapsed = elapsed;
+                  try {
+  									player.getTimePosition(function(elapsed) {
+  										status.elapsed = elapsed;
 
-										// emit current position
-										io.emit('api:controls:status', status);
-									});
+  										// emit current position
+  										io.emit('api:controls:status', status);
+  									});
+                  } catch (ex) {}
 								}, 1000);
 							}
 						} else {
@@ -149,28 +158,37 @@ module.exports = function(io, socket) {
 	/**
 	 *	Stop command
 	 */
-	socket.on('api:controls:stop', function() {
+	socket.on('api:controls:stop', function(fn) {
 		console.log('Received stop')
 
 		if (status.state == PlayerState.playing
 			|| status.state == PlayerState.paused
 			&& player != null) {
-				// stop music
+      console.log("stopping playback");
+			// invalidate timer
+			clearInterval(t);
+
+			// stop music
+      player.removeAllListeners('end');
 			player.stop();
 			player = null;
 
 			// set state to stopped
 			status.state = PlayerState.stopped;
 
-			// invalidate timer
-			clearInterval(t);
-
 			// set teh status to initial state
 			status = initalStatus;
 
 			// emit current position
 			io.emit('api:controls:status', status);
-		}
+        if (typeof fn === 'function') {
+          fn();
+      }
+		} else {
+      if (typeof fn === 'function') {
+        fn();
+      }
+    }
 	});
 
 	/**

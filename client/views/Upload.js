@@ -2,9 +2,19 @@ var Upload = React.createClass({
   getInitialState: function() {
     return { visible: false, files: [] };
   },
-
+  closeModal: function() {
+    $(".modal-close").on('click', function() {
+      $(".upload-trigger").closeModal();
+      $("#upload")
+        .animate({
+          'bottom': '-100%'
+        });
+    });
+  },
   componentDidMount: function() {
     var self = this;
+
+    this.setState({ visible: false });
 
     var dropzone = new Dropzone(".dropzone", {
       url: "/upload",
@@ -17,15 +27,7 @@ var Upload = React.createClass({
       }
     });
 
-    $(".modal-close").on('click', function() {
-      $(".upload-trigger").closeModal();
-      $("#upload")
-        .animate({
-          'bottom': '-100%'
-        });
 
-      this.setState({ visible: false });
-    }.bind(this));
 
     dropzone.on('dragenter', function() {
       // show the upload window
@@ -77,7 +79,7 @@ var Upload = React.createClass({
             </ul>
           </div>
           <div className="modal-footer">
-            <a href="#!" className="modal-action modal-close waves-effect waves-green btn-flat">Hide</a>
+            <a href="#!" className="modal-action modal-close waves-effect waves-green btn-flat" onClick={this.closeModal}>Hide</a>
           </div>
         </div>
       </div>

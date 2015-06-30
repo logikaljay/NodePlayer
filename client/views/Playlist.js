@@ -50,11 +50,11 @@ var Track = React.createClass({
   },
 
   play: function() {
-    socket.emit('api:controls:stop');
-
-    socket.emit('api:controls:play',{
-      file: this.props.data.file
-    });
+    socket.emit('api:controls:stop', function() {
+      socket.emit('api:controls:play',{
+        file: this.props.data.file
+      });
+    }.bind(this));
 
     this.setState({ active: true });
   },

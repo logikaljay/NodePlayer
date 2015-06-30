@@ -24,19 +24,34 @@ module.exports = function(io, socket) {
   });
 
   socket.on('api:library:refresh', function() {
+    console.log('refreshing');
+    socket.emit('api:library:refreshing');
+
     library.refresh(function() {
       var db = new sqlite3.Database(__dirname + '/../library.db');
       db.serialize(function() {
-        db.all("SELECT * FROM library", function(err, rows) {
+        // iterate over artists for art work
+        db.all("SELECT artist, album FROM library ORDER BY artist", function(err, rows) {
 
           // iterate over rows - downloading album art if necessary
           if (typeof rows !== 'undefined') {
+            var fetched = [];
+
             rows.forEach(function(row) {
-              art(row.artist, row.album);
+              // don't fetch something we have already requested
+              if (fetched.indexOf(row.artist + row.album) == -1) {
+                art(row.artist, row.album);
+                fetched.push(row.artist + row.album);
+              }
             });
           }
+        });
 
-          io.emit('api:library:list', rows);
+        // iterate over artists for list
+        db.serialize(function() {
+          db.all("SELECT artist FROM library GROUP BY artist ORDER BY artist", function(err, rows) {
+            io.emit('api:library:artists', rows);
+          });
         });
       });
 

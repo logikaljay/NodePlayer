@@ -1,6 +1,8 @@
 var fs = require('fs');
 var path = require('path');
-module.exports = function(dir, done) {
+module.exports = walk;
+
+function walk(dir, done) {
   var results = [];
   fs.readdir(dir, function(err, list) {
     if (err) return done(err);
@@ -21,4 +23,4 @@ module.exports = function(dir, done) {
       });
     });
   });
-};
+}

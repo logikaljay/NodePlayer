@@ -2,3 +2,4 @@ node_modules/*
 client/data/*
 .DS_Store
 *.jpg
+library.db

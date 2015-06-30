@@ -18,10 +18,12 @@ var Controls = React.createClass({
   },
 
   play: function() {
-    socket.emit('api:controls:play',{
-      file: './public/data/test.mp3'
+    socket.emit('api:controls:stop', function() {
+      socket.emit('api:controls:play',{
+        file: './public/data/test.mp3'
+      });
+      this.setState({ state: 1 })
     });
-    this.setState({ state: 1 })
   },
 
   pause: function() {

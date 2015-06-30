@@ -1,23 +1,39 @@
 var Library = React.createClass({
   getInitialState: function() {
-    return { artists: [] };
+    return { artists: [], refreshing: false };
   },
 
   componentDidMount: function() {
     socket.emit('api:library:artists', function(artists) {
       this.setState({ artists: artists });
     }.bind(this));
+
+    socket.on('api:library:artists', function(artists) {
+      this.setState({ artists: artists, refreshing: false });
+    }.bind(this));
+
+    socket.on('api:library:refreshing', function() {
+      console.log("refreshing...");
+      this.setState({ refreshing: true });
+    }.bind(this));
   },
 
   render: function() {
-    var artists = this.state.artists.map(function(artist) {
-      return <Artist artist={artist} />;
-    });
-    return (
-      <ul className="collapsible" data-collapsible="accordion" style={{overflow: 'auto', height: '70%'}}>
-        {artists}
-      </ul>
-    );
+
+    if (this.state.refreshing) {
+      return (
+        <div className="loading" style={{overflow:'auto', height: '70%'}}>Refreshing...</div>
+      );
+    } else {
+      var artists = this.state.artists.map(function(artist) {
+        return <Artist artist={artist} />;
+      });
+      return (
+        <ul className="collapsible" data-collapsible="accordion" style={{overflow: 'auto', height: '70%'}}>
+          {artists}
+        </ul>
+      );
+    }
   }
 });
 
