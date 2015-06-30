@@ -6,6 +6,8 @@ module.exports = function(io, socket) {
   socket.on('api:playlist:add', function(song) {
     var db = new sqlite3.Database(__dirname + '/../library.db');
     db.serialize(function() {
+      db.run("DELETE FROM playlist WHERE file = ?", song.file);
+
       var stmt = db.prepare(
         'INSERT INTO playlist (file, title, artist, album, duration)' +
         'VALUES (?, ?, ?, ?, ?)'
@@ -44,7 +46,7 @@ module.exports = function(io, socket) {
 
       db.all("SELECT * FROM playlist", function(err, rows) {
         // emit to all sockets
-        io.emit('api:playlist:change', playlist);
+        io.emit('api:playlist:change', rows);
       });
     });
 

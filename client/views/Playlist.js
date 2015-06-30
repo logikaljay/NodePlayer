@@ -13,6 +13,7 @@ var Playlist = React.createClass({
     }.bind(this));
     socket.on('api:playlist:change', function(songs) {
       console.log("!!");
+      console.log(songs);
       this.setState({songs: songs});
     }.bind(this));
     socket.on('api:controls:status', function(status) {

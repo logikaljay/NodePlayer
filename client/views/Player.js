@@ -12,7 +12,6 @@ var Player = React.createClass({
             <Library />
           </div>
           <div className="col s6">
-            <h5>Current playlist</h5>
             <Playlist />
           </div>
         </div>

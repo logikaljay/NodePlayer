@@ -84,15 +84,15 @@ var Controls = React.createClass({
               <a href="javascript:void(0);" onClick={this.refresh}><i className="material-icons medium">replay</i></a>
             </div>
             <div className="col s6 center-align">
-              <i className="material-icons medium" onClick={this.prev}>skip_previous</i>
+              <i className="material-icons medium" style={styles.hidden} onClick={this.prev}>skip_previous</i>
               <a href="javascript:void(0);" onClick={this.pause}><i className={"material-icons medium " + (this.state.state == "2" && "active")}>pause</i></a>
               <a href="javascript:void(0);" onClick={this.play}><i className={"material-icons medium " + (this.state.state == "1" && "active")}>play_arrow</i></a>
               <a href="javascript:void(0);" onClick={this.stop}><i className={"material-icons medium " + (this.state.state == "3" && "active")}>stop</i></a>
-              <i className="material-icons medium" onClick={this.next}>skip_next</i>
+              <i className="material-icons medium" style={styles.hidden} onClick={this.next}>skip_next</i>
             </div>
             <div className="col s3 right-align">
-              <i className="material-icons medium">shuffle</i>
-              <i className="material-icons medium">volume_up</i>
+              <i className="material-icons medium" style={styles.hidden}>shuffle</i>
+              <i className="material-icons medium" style={styles.hidden}>volume_up</i>
             </div>
           </div>
         </footer>
