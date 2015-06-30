@@ -20,12 +20,12 @@ var Playlist = React.createClass({
 
     $(function() {
       $(".playlist").css({
-        height:$(window).height() - 145
+        height:$(window).height() - 142
       })
     });
     $(window).on('resize', function() {
       $(".playlist").css({
-        height:$(window).height() - 145
+        height:$(window).height() - 142
       })
     });
   },
@@ -63,14 +63,25 @@ var Track = React.createClass({
     socket.emit('api:playlist:remove', this.props.data);
   },
 
+  artError: function() {
+    this.setState({artError: true});
+  },
+
   render: function() {
+    var art;
+    if (this.state.artError) {
+      art = <i className="material-icons circle playlist-img">play_arrow</i>;
+    } else {
+      var artUrl = "/art/small-" + this.props.data.artist + "-" + this.props.data.album + ".jpg";
+      art = <img src={artUrl} className="circle playlist-img" onError={this.artError} />;
+    }
     return (
       <li className={"collection-item avatar " + (this.props.active && "active")}>
-        <a href="javascript:void(0);"><i className="material-icons circle playlist-img" onClick={this.play}>play_arrow</i></a>
-        <span className="title">{this.props.data.title}</span>
-        <p>{this.props.data.artist} <br />
-           {this.props.data.album}
-        </p>
+        <a href="javascript:void(0);" onClick={this.play}>
+          {art}
+        </a>
+        <span className="title">{this.props.data.artist} - {this.props.data.title}</span>
+        <p>{this.props.data.album}</p>
         <a href="javascript:void(0);" className="secondary-content" onClick={this.delete}><i className="material-icons">delete</i></a>
       </li>
     );
