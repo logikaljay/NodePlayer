@@ -26,10 +26,10 @@ i.medium {
   display: none;
 }
 
-.dz-message {
+.dz-default {
   display: none;
 }
 
-.dz-preview {
-  display: none;
+.collapsible {
+  margin-top: 0 !important;
 }

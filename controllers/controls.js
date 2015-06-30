@@ -1,6 +1,7 @@
 var fs = require('fs');
 var Mplayer = require('node-mplayer');
 var mm = require('musicmetadata');
+var sqlite3 = require('sqlite3').verbose();
 var t;
 
 var PlayerState = {
@@ -27,7 +28,53 @@ module.exports = function(io, socket) {
 		clearInterval(t);
 
 		// check if queue.length > 0
-		// true: next song
+		var db = new sqlite3.Database(__dirname + '/../library.db');
+		db.serialize(function() {
+			db.all("SELECT * FROM playlist", function(err, rows) {
+				// find the row with our song that was just playing
+				var index = 0;
+				for (var i = 0; i<rows.length; i++) {
+					if (status.file == rows[i].file) {
+						index = i;
+						break;
+					}
+				}
+
+				// increment the index;
+
+				if (rows.length > 0 && rows.length >= (index + 1)) {
+					var song = rows[index + 1];
+					if (song !== undefined) {
+						// play index
+						player.setFile(song.file);
+						player.play();
+
+						var parser = mm(fs.createReadStream(song.file), {duration: true}, function(err, data) {
+							status.duration = data.duration;
+							status.title = data.title;
+							status.artist = data.artist;
+							status.album = data.album;
+						});
+
+						status.file = song.file;
+						status.state = PlayerState.playing;
+
+						t = setInterval(function() {
+							player.getTimePosition(function(elapsed) {
+								status.elapsed = elapsed;
+
+								// emit current position
+								io.emit('api:controls:status', status);
+							});
+						}, 1000);
+					}
+				}
+
+			});
+		});
+
+		db.close();
+
 		// false:
 		status.state = PlayerState.idle;
 	})

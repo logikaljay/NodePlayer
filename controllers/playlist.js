@@ -1,29 +1,53 @@
 var library = require('../lib/library');
+var sqlite3 = require('sqlite3').verbose();
 var playlist = [];
 
 module.exports = function(io, socket) {
-  socket.on('api:playlist:add', function(file) {
-    library.getItems(function(items) {
-      // find the song from library, add to playlist.
-      var song = items.filter(function(entry) {
-        return entry.file == file;
+  socket.on('api:playlist:add', function(song) {
+    var db = new sqlite3.Database(__dirname + '/../library.db');
+    db.serialize(function() {
+      var stmt = db.prepare(
+        'INSERT INTO playlist (file, title, artist, album, duration)' +
+        'VALUES (?, ?, ?, ?, ?)'
+      );
+
+      stmt.run(song.file, song.title, song.artist, song.album, song.duration);
+      stmt.finalize();
+
+      db.all("SELECT * FROM playlist", function(err, rows) {
+        // emit to all sockets
+        io.emit('api:playlist:change', rows);
       });
-
-      // emit api:playlist:change
-      playlist.push(song[0]);
-      io.emit('api:playlist:change', playlist);
-    });
-  });
-
-  socket.on('api:playlist:list', function() {
-    io.emit('api:playlist:change', playlist);
-  });
-
-  socket.on('api:playlist:remove', function(file) {
-    playlist = playlist.filter(function(item) {
-      return item.file !== file;
     });
 
-    io.emit('api:playlist:change', playlist);
+    db.close();
+  });
+
+  socket.on('api:playlist:list', function(fn) {
+    var db = new sqlite3.Database(__dirname + '/../library.db');
+    db.serialize(function() {
+      db.all("SELECT * FROM playlist", function(err, rows) {
+        // emit to socket that requested the list
+        fn(rows);
+      });
+    });
+
+    db.close();
+  });
+
+  socket.on('api:playlist:remove', function(song) {
+    var db = new sqlite3.Database(__dirname + '/../library.db');
+    db.serialize(function() {
+      var stmt = db.prepare('DELETE FROM playlist WHERE file = ?');
+      stmt.run(song.file);
+      stmt.finalize();
+
+      db.all("SELECT * FROM playlist", function(err, rows) {
+        // emit to all sockets
+        io.emit('api:playlist:change', playlist);
+      });
+    });
+
+    db.close();
   });
 }

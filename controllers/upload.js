@@ -1,13 +1,16 @@
 var fs = require('fs');
 
 var upload = function(req, res) {
-  console.log(req.files);
-  fs.readFile(req.files[0], function(err, data) {
-    var newPath = __dirname + "/public/data/" + req.files[0].name;
-    fs.writeFile(newPath, data, function(err) {
-      console.log(err);
+  var fstream;
+  req.pipe(req.busboy);
+  req.busboy.on('file', function (fieldname, file, filename) {
+    console.log("Uploading: " + filename);
+    fstream = fs.createWriteStream(__dirname + '/../client/data/' + filename);
+    file.pipe(fstream);
+    fstream.on('close', function () {
+      res.sendStatus(200);
     });
   });
 };
 
-module.exports
+module.exports = upload;

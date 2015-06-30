@@ -8,16 +8,18 @@ var Playlist = React.createClass({
   },
 
   componentDidMount: function() {
-    socket.emit('api:playlist:list');
-    socket.on('api:playlist:change', function(songs) {
+    socket.emit('api:playlist:list', function(songs) {
       this.setState({songs: songs});
     }.bind(this));
-
+    socket.on('api:playlist:change', function(songs) {
+      console.log("!!");
+      this.setState({songs: songs});
+    }.bind(this));
     socket.on('api:controls:status', function(status) {
       this.setState({ currentSong: status.file, state: status.state })
     }.bind(this))
   },
-  
+
   render: function() {
     var songs = this.state.songs.map(function(song) {
       var active = (song.file == this.state.currentSong) && this.state.state != 3;
@@ -48,8 +50,8 @@ var Track = React.createClass({
   },
 
   delete: function() {
-    console.log("sending delete: " + this.props.data.file);
-    socket.emit('api:playlist:remove', this.props.data.file);
+    console.log("sending delete: " + this.props.data);
+    socket.emit('api:playlist:remove', this.props.data);
   },
 
   render: function() {
