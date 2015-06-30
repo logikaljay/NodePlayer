@@ -42,12 +42,12 @@ var Artist = React.createClass({
     $(".collapsible").collapsible();
     $(function() {
       $(".collapsible").css({
-        height:$(window).height() - 145
+        height:$(window).height() - 142
       })
     });
     $(window).on('resize', function() {
       $(".collapsible").css({
-        height:$(window).height() - 145
+        height:$(window).height() - 142
       })
     });
   },
@@ -69,14 +69,13 @@ var Artist = React.createClass({
     return (
       <li style={styles}>
         <div className="collapsible-header">
-          <i className="material-icons">filter_drama</i>
           {this.props.artist}
           <span className="secondary-content">
             <a href="javascript:void(0);" onClick={this.addAll}><i className="material-icons">add</i></a>
           </span>
         </div>
         <div className="collapsible-body">
-          <div style={{marginLeft: '55px'}}>
+          <div>
             <table className="table table-hover" width="100%">
               <tbody>
                 {songs}
@@ -90,13 +89,29 @@ var Artist = React.createClass({
 });
 
 var Song = React.createClass({
+  getInitialState: function() {
+    return { artError: false };
+  },
+
   add: function() {
     socket.emit('api:playlist:add', this.props.song);
   },
 
+  artError: function() {
+    this.setState({ artError: true });
+  },
+
   render: function() {
+    var art;
+    if (this.state.artError) {
+      art = <td></td>;
+    } else {
+      var artUrl = "/art/small-" + this.props.song.artist + "-" + this.props.song.album + ".jpg";
+      art = <td width="55"><img src={artUrl} onError={this.artError} /></td>;
+    }
     return (
       <tr>
+        {art}
         <td>{this.props.song.title}</td>
         <td>{this.props.song.album}</td>
         <td><a href="javascript:void(0);" onClick={this.add}><i className="material-icons">add</i></a></td>

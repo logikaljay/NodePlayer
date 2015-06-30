@@ -13,8 +13,6 @@ app.use(busboy());
 
 app.post('/upload', require('./controllers/upload'));
 
-require('./controllers/art')(io);
-
 io.on('connection', function(socket) {
 	require('./controllers/controls')(io, socket);
 	require('./controllers/library')(io, socket);

@@ -6,6 +6,7 @@ var albumArt = require('album-art');
 var library = require('../lib/library');
 var walk = require('../helpers/walk');
 var sqlite3 = require('sqlite3').verbose();
+var art = require('../lib/art');
 
 module.exports = function(io, socket) {
   /**
@@ -27,6 +28,14 @@ module.exports = function(io, socket) {
       var db = new sqlite3.Database(__dirname + '/../library.db');
       db.serialize(function() {
         db.all("SELECT * FROM library", function(err, rows) {
+
+          // iterate over rows - downloading album art if necessary
+          if (typeof rows !== 'undefined') {
+            rows.forEach(function(row) {
+              art(row.artist, row.album);
+            });
+          }
+
           io.emit('api:library:list', rows);
         });
       });
